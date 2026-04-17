@@ -42,11 +42,15 @@ struct PrompterOverlayView: View {
                     )
                     .mask(
                         VStack(spacing: 0) {
-                            LinearGradient(colors: [.clear, .white], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 60)
+                            LinearGradient(
+                                colors: [.clear, .white], startPoint: .top, endPoint: .bottom
+                            )
+                            .frame(height: 60)
                             Color.white
-                            LinearGradient(colors: [.white, .clear], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 60)
+                            LinearGradient(
+                                colors: [.white, .clear], startPoint: .top, endPoint: .bottom
+                            )
+                            .frame(height: 60)
                         }
                     )
                 }
@@ -88,12 +92,15 @@ struct PrompterOverlayView: View {
                             .foregroundStyle(.white.opacity(0.5))
 
                         Circle()
-                            .fill(isListening && !isPaused ? Color.green : Color.gray.opacity(0.5))
+                            .fill(
+                                isListening && !isPaused
+                                    ? CueColors.micActive : Color.gray.opacity(0.5)
+                            )
                             .frame(width: 7, height: 7)
 
                         if totalSlides > 0 {
                             Text("\(slideIndex + 1)/\(totalSlides)")
-                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .font(CueFont.mono(11, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.8))
                         }
                     }
@@ -129,17 +136,17 @@ struct PrompterOverlayView: View {
         HStack(spacing: 12) {
             if isPaused {
                 Text("PAUSED")
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .foregroundStyle(.yellow.opacity(0.8))
+                    .font(CueFont.mono(11, weight: .semibold))
+                    .foregroundStyle(CueColors.warning)
             } else if let error = speechError {
                 Text(error)
                     .font(.system(size: 11))
-                    .foregroundStyle(.yellow.opacity(0.8))
+                    .foregroundStyle(CueColors.warning)
                     .lineLimit(1)
             } else if !lastHeardWords.isEmpty {
                 Text(lastHeardWords)
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.green.opacity(0.6))
+                    .font(CueFont.mono(11))
+                    .foregroundStyle(CueColors.micActive.opacity(0.6))
                     .lineLimit(1)
                     .truncationMode(.head)
             }
@@ -148,13 +155,13 @@ struct PrompterOverlayView: View {
 
             if wordsHeard > 0 {
                 Text("\(wordsHeard)w")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.white.opacity(0.4))
+                    .font(CueFont.mono(11))
+                    .foregroundStyle(.white.opacity(0.3))
             }
 
             Text(formattedTime(elapsedTime))
-                .font(.system(size: 12, design: .monospaced))
-                .foregroundStyle(.white.opacity(0.5))
+                .font(CueFont.mono(12))
+                .foregroundStyle(.white.opacity(0.3))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)

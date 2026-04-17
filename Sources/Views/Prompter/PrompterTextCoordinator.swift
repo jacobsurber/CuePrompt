@@ -32,14 +32,13 @@ final class PrompterTextCoordinator {
     var targetScrollPosition: Double = 0
     var targetTotalWords: Int = 0
 
-
     /// Timer for smooth interpolation (~60fps).
     private var displayLink: Timer?
 
-
     func startDisplayLink() {
         guard displayLink == nil else { return }
-        displayLink = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+        displayLink = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) {
+            [weak self] _ in
             self?.interpolateScroll()
         }
     }
@@ -66,14 +65,15 @@ final class PrompterTextCoordinator {
     /// Highlight the current word. Visual expansion is handled by PrompterLayoutManager.
     func updateHighlight(for position: Double) {
         guard let textView = textView,
-              let layoutManager = textView.layoutManager,
-              !wordCharPositions.isEmpty else { return }
+            let layoutManager = textView.layoutManager,
+            !wordCharPositions.isEmpty
+        else { return }
 
         let wordIndex = max(0, min(Int(position), wordCharPositions.count - 1))
         guard wordIndex != highlightedWordIndex, wordIndex < wordCharPositions.count else { return }
 
         let storage = textView.textStorage!
-        let color = NSColor.white.withAlphaComponent(0.18)
+        let color = CueColors.accentNS.withAlphaComponent(0.25)
 
         // Remove old highlight and invalidate its glow region
         if highlightedWordIndex >= 0 && highlightedWordIndex < wordCharPositions.count {
@@ -81,7 +81,8 @@ final class PrompterTextCoordinator {
             let oldLen = min(wordCharLengths[highlightedWordIndex], max(0, storage.length - oldPos))
             if oldPos < storage.length && oldLen > 0 {
                 let oldRange = NSRange(location: oldPos, length: oldLen)
-                layoutManager.removeTemporaryAttribute(.backgroundColor, forCharacterRange: oldRange)
+                layoutManager.removeTemporaryAttribute(
+                    .backgroundColor, forCharacterRange: oldRange)
                 if let dirtyRect = glowDirtyRect(for: oldRange) {
                     textView.setNeedsDisplay(dirtyRect)
                 }
@@ -93,7 +94,8 @@ final class PrompterTextCoordinator {
         let charLen = min(wordCharLengths[wordIndex], storage.length - charPos)
         if charLen > 0 {
             let newRange = NSRange(location: charPos, length: charLen)
-            layoutManager.addTemporaryAttribute(.backgroundColor, value: color, forCharacterRange: newRange)
+            layoutManager.addTemporaryAttribute(
+                .backgroundColor, value: color, forCharacterRange: newRange)
             if let dirtyRect = glowDirtyRect(for: newRange) {
                 textView.setNeedsDisplay(dirtyRect)
             }
@@ -105,9 +107,11 @@ final class PrompterTextCoordinator {
     /// Compute the view-coordinate rect covering a word's glyphs plus the glow expansion.
     private func glowDirtyRect(for charRange: NSRange) -> NSRect? {
         guard let textView = textView,
-              let layoutManager = textView.layoutManager,
-              let textContainer = textView.textContainer else { return nil }
-        let glyphRange = layoutManager.glyphRange(forCharacterRange: charRange, actualCharacterRange: nil)
+            let layoutManager = textView.layoutManager,
+            let textContainer = textView.textContainer
+        else { return nil }
+        let glyphRange = layoutManager.glyphRange(
+            forCharacterRange: charRange, actualCharacterRange: nil)
         var rect = layoutManager.boundingRect(forGlyphRange: glyphRange, in: textContainer)
         let origin = textView.textContainerOrigin
         rect.origin.x += origin.x
@@ -121,8 +125,9 @@ final class PrompterTextCoordinator {
     /// Build the word-to-pixel lookup table from the laid-out text.
     func buildWordPixelMap() {
         guard let textView = textView,
-              let layoutManager = textView.layoutManager,
-              let textContainer = textView.textContainer else { return }
+            let layoutManager = textView.layoutManager,
+            let textContainer = textView.textContainer
+        else { return }
 
         wordPixelY = []
         let textStorage = textView.textStorage!
@@ -134,7 +139,8 @@ final class PrompterTextCoordinator {
                 continue
             }
             let glyphIndex = layoutManager.glyphIndexForCharacter(at: clampedPos)
-            let lineRect = layoutManager.lineFragmentRect(forGlyphAt: glyphIndex, effectiveRange: nil)
+            let lineRect = layoutManager.lineFragmentRect(
+                forGlyphAt: glyphIndex, effectiveRange: nil)
             wordPixelY.append(lineRect.origin.y)
         }
 
@@ -151,9 +157,10 @@ final class PrompterTextCoordinator {
     /// Smoothly scroll so the current word is centered in the viewport.
     func scrollToWord(at position: Double) {
         guard let textView = textView,
-              let scrollView = scrollView,
-              let layoutManager = textView.layoutManager,
-              !wordCharPositions.isEmpty else { return }
+            let scrollView = scrollView,
+            let layoutManager = textView.layoutManager,
+            !wordCharPositions.isEmpty
+        else { return }
 
         let wordIndex = max(0, min(Int(position), wordCharPositions.count - 1))
         let charPos = wordCharPositions[wordIndex]
@@ -174,8 +181,6 @@ final class PrompterTextCoordinator {
         let docHeight = scrollView.documentView?.frame.height ?? 0
         let maxScroll = max(0, docHeight - vpHeight)
         let clampedTarget = max(0, min(targetOffset, maxScroll))
-
-
 
         // Smooth interpolation
         let alpha: CGFloat = 0.10

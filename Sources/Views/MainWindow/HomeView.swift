@@ -18,10 +18,10 @@ struct HomeView: View {
         .frame(minWidth: 500, minHeight: 400)
         .overlay {
             if isDragTargeted {
-                RoundedRectangle(cornerRadius: 12)
-                    .strokeBorder(Color.accentColor, lineWidth: 2)
+                RoundedRectangle(cornerRadius: CueRadius.lg)
+                    .strokeBorder(CueColors.accent, lineWidth: 2)
                     .background(
-                        Color.accentColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 12)
+                        CueColors.accentMuted, in: RoundedRectangle(cornerRadius: CueRadius.lg)
                     )
                     .padding(4)
                     .allowsHitTesting(false)
@@ -94,6 +94,7 @@ struct HomeView: View {
                 appState.startPresenting()
             }
             .buttonStyle(.borderedProminent)
+            .tint(CueColors.accent)
             .disabled(appState.currentContent == nil && scriptText.isEmpty)
             .keyboardShortcut(.return, modifiers: .command)
         }
@@ -219,10 +220,10 @@ struct HomeView: View {
 
     private var connectionColor: Color {
         switch appState.bridgeCoordinator.state {
-        case .connected: .green
-        case .listening: .yellow
-        case .disconnected: .gray
-        case .error: .red
+        case .connected: CueColors.micActive
+        case .listening: CueColors.warning
+        case .disconnected: CueColors.textFaint
+        case .error: CueColors.error
         }
     }
 

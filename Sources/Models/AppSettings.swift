@@ -4,7 +4,7 @@ import Foundation
 struct AppSettings: Codable, Equatable {
     // Appearance
     var fontSize: Double = 38
-    var fontName: String = "SF Pro"
+    var fontName: String = "New York"
     var textOpacity: Double = 0.4  // opacity for already-read text
     var lineSpacing: Double = 1.4
 
@@ -37,19 +37,27 @@ struct AppSettings: Codable, Equatable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         // Decode each field with a default fallback — new keys won't crash
         fontSize = try container.decodeIfPresent(Double.self, forKey: .fontSize) ?? 38
-        fontName = try container.decodeIfPresent(String.self, forKey: .fontName) ?? "SF Pro"
+        fontName = try container.decodeIfPresent(String.self, forKey: .fontName) ?? "New York"
         textOpacity = try container.decodeIfPresent(Double.self, forKey: .textOpacity) ?? 0.4
         lineSpacing = try container.decodeIfPresent(Double.self, forKey: .lineSpacing) ?? 1.4
         countdownDuration = try container.decodeIfPresent(Int.self, forKey: .countdownDuration) ?? 3
-        autoExpandOnStart = try container.decodeIfPresent(Bool.self, forKey: .autoExpandOnStart) ?? true
-        collapseOnFinish = try container.decodeIfPresent(Bool.self, forKey: .collapseOnFinish) ?? true
-        finishFadeDelay = try container.decodeIfPresent(TimeInterval.self, forKey: .finishFadeDelay) ?? 3.0
-        preferredProvider = try container.decodeIfPresent(String.self, forKey: .preferredProvider) ?? "WhisperKit"
-        preferredModel = try container.decodeIfPresent(String.self, forKey: .preferredModel) ?? "openai_whisper-tiny"
+        autoExpandOnStart =
+            try container.decodeIfPresent(Bool.self, forKey: .autoExpandOnStart) ?? true
+        collapseOnFinish =
+            try container.decodeIfPresent(Bool.self, forKey: .collapseOnFinish) ?? true
+        finishFadeDelay =
+            try container.decodeIfPresent(TimeInterval.self, forKey: .finishFadeDelay) ?? 3.0
+        preferredProvider =
+            try container.decodeIfPresent(String.self, forKey: .preferredProvider) ?? "WhisperKit"
+        preferredModel =
+            try container.decodeIfPresent(String.self, forKey: .preferredModel)
+            ?? "openai_whisper-tiny"
         expandedWidth = try container.decodeIfPresent(Double.self, forKey: .expandedWidth) ?? 800
         expandedHeight = try container.decodeIfPresent(Double.self, forKey: .expandedHeight) ?? 400
         showThumbnails = try container.decodeIfPresent(Bool.self, forKey: .showThumbnails) ?? true
-        thumbnailPosition = try container.decodeIfPresent(ThumbnailPosition.self, forKey: .thumbnailPosition) ?? .right
+        thumbnailPosition =
+            try container.decodeIfPresent(ThumbnailPosition.self, forKey: .thumbnailPosition)
+            ?? .right
         targetDisplayID = try container.decodeIfPresent(UInt32.self, forKey: .targetDisplayID)
     }
 

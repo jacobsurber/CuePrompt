@@ -90,6 +90,7 @@ private struct RootView: View {
                 OnboardingView(appState: appState, isComplete: $hasCompletedOnboarding)
             }
         }
+        .tint(CueColors.accent)
         .onChange(of: hasCompletedOnboarding) { _, completed in
             if completed && !didSetup {
                 performSetup()
@@ -112,25 +113,25 @@ private struct RootView: View {
         // --simulate flag: auto-load test text and start simulated speech
         if CommandLine.arguments.contains("--simulate") {
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 500_000_000) // let window settle
+                try? await Task.sleep(nanoseconds: 500_000_000)  // let window settle
                 let testText = """
-                Welcome to CuePrompt, the intelligent teleprompter application. \
-                This is a test of the scrolling and highlight system. \
-                The words should advance automatically at a steady pace. \
-                As each word is spoken, the highlight should move forward \
-                and the text should scroll smoothly to keep the current word visible. \
-                If you are reading this, the simulation mode is working correctly. \
-                The quick brown fox jumps over the lazy dog near the river bank. \
-                We need enough text here to require scrolling past the first screen. \
-                Technology continues to reshape how we communicate and collaborate. \
-                Remote teams rely on tools like this to deliver presentations effectively. \
-                The sun sets behind the mountains casting long shadows across the valley. \
-                Engineers build bridges between ideas and implementation every single day. \
-                Music fills the room as the orchestra performs the final movement. \
-                Data flows through pipelines transforming raw numbers into actionable insights. \
-                The garden grows wild with roses and lilies blooming in every direction. \
-                Stars appear one by one as twilight fades into the deep night sky.
-                """
+                    Welcome to CuePrompt, the intelligent teleprompter application. \
+                    This is a test of the scrolling and highlight system. \
+                    The words should advance automatically at a steady pace. \
+                    As each word is spoken, the highlight should move forward \
+                    and the text should scroll smoothly to keep the current word visible. \
+                    If you are reading this, the simulation mode is working correctly. \
+                    The quick brown fox jumps over the lazy dog near the river bank. \
+                    We need enough text here to require scrolling past the first screen. \
+                    Technology continues to reshape how we communicate and collaborate. \
+                    Remote teams rely on tools like this to deliver presentations effectively. \
+                    The sun sets behind the mountains casting long shadows across the valley. \
+                    Engineers build bridges between ideas and implementation every single day. \
+                    Music fills the room as the orchestra performs the final movement. \
+                    Data flows through pipelines transforming raw numbers into actionable insights. \
+                    The garden grows wild with roses and lilies blooming in every direction. \
+                    Stars appear one by one as twilight fades into the deep night sky.
+                    """
                 appState.loadText(testText)
                 appState.startSimulatedPresenting()
             }

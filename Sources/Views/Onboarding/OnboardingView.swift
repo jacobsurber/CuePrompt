@@ -99,7 +99,7 @@ private struct MicPermissionStepView: View {
 
             if permissionManager.microphoneStatus == .granted {
                 Label("Permission granted", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(CueColors.micActive)
             }
 
             HStack(spacing: 12) {
@@ -158,7 +158,7 @@ private struct SpeechPermissionStepView: View {
 
             if permissionManager.speechRecognitionStatus == .granted {
                 Label("Permission granted", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(CueColors.micActive)
             }
 
             HStack(spacing: 12) {

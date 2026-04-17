@@ -128,13 +128,33 @@ final class AppState {
     func startPresenting() {
         guard currentContent != nil else { return }
 
-        // Gate on permissions — refresh and check before starting
+        // Gate on permissions — refresh, request if not determined, then check
         permissionManager.refreshStatus()
+
+        // If not yet asked, request permissions first
+        if permissionManager.microphoneStatus == .notDetermined
+            || permissionManager.speechRecognitionStatus == .notDetermined
+        {
+            Task { @MainActor in
+                let granted = await permissionManager.requestAll()
+                if granted {
+                    beginPresentation()
+                } else {
+                    showPermissionAlert = true
+                }
+            }
+            return
+        }
+
         guard permissionManager.allGranted else {
             showPermissionAlert = true
             return
         }
 
+        beginPresentation()
+    }
+
+    private func beginPresentation() {
         // Minimize the main window so it doesn't compete with the presentation
         NSApplication.shared.mainWindow?.miniaturize(nil)
 

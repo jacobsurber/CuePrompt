@@ -79,22 +79,14 @@ final class PermissionManager {
     return speech
   }
 
-  /// Open System Settings to the relevant privacy pane(s).
-  /// Note: x-apple.systempreferences: URLs are undocumented and may change across macOS versions.
+  /// Open System Settings to the relevant privacy pane.
   func openSystemSettings() {
-    if microphoneStatus == .denied {
-      if let url = URL(
-        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone")
-      {
-        NSWorkspace.shared.open(url)
-      }
-    }
-    if speechRecognitionStatus == .denied {
-      if let url = URL(
-        string: "x-apple.systempreferences:com.apple.preference.security?Privacy_SpeechRecognition")
-      {
-        NSWorkspace.shared.open(url)
-      }
+    // On macOS 14+ (Sonoma), the old x-apple.systempreferences URLs no longer work.
+    // Use the documented Privacy & Security deep link instead.
+    if let url = URL(
+      string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension")
+    {
+      NSWorkspace.shared.open(url)
     }
   }
 }

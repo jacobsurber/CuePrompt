@@ -19,14 +19,15 @@ struct PrompterContentView: View {
                         slideIndex: appState.engine.currentSlideIndex,
                         totalSlides: appState.prompterState.totalSlides,
                         progress: appState.engine.progress,
-                        isListening: appState.speechCoordinator.isListening && !appState.wasPausedBeforeCollapse,
+                        isListening: appState.speechCoordinator.isListening
+                            && !appState.wasPausedBeforeCollapse,
                         wordsHeard: appState.speechCoordinator.wordCount,
                         onTap: { appState.toggleExpandCollapse() }
                     )
                     if let error = appState.speechCoordinator.error {
                         Text(error)
                             .font(.system(size: 10))
-                            .foregroundStyle(.yellow)
+                            .foregroundStyle(CueColors.warning)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)
                             .background(Color.black.opacity(0.8), in: Capsule())
@@ -42,7 +43,8 @@ struct PrompterContentView: View {
                     slideIndex: appState.engine.currentSlideIndex,
                     totalSlides: appState.prompterState.totalSlides,
                     elapsedTime: appState.prompterState.elapsedTime,
-                    isListening: appState.speechCoordinator.isListening && appState.prompterState.mode != .paused,
+                    isListening: appState.speechCoordinator.isListening
+                        && appState.prompterState.mode != .paused,
                     isPaused: appState.prompterState.mode == .paused,
                     wordsHeard: appState.speechCoordinator.wordCount,
                     lastHeardWords: appState.speechCoordinator.lastHeardWords,

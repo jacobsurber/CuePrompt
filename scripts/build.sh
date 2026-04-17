@@ -85,11 +85,14 @@ if [ -n "$SIGNING_IDENTITY" ]; then
   fi
 
   echo "🔏 Code signing app with stable identity..."
-  cueprompt_sign_app_bundle \
-    "CuePrompt.app" \
-    "$ENTITLEMENTS" \
-    "$SIGNING_IDENTITY"
-  codesign --verify --verbose CuePrompt.app
+  if ! cueprompt_sign_app_bundle "CuePrompt.app" "$ENTITLEMENTS" "$SIGNING_IDENTITY"; then
+    echo "❌ Code signing failed. Check that $ENTITLEMENTS exists and the identity is valid."
+    exit 1
+  fi
+  if ! codesign --verify --verbose CuePrompt.app; then
+    echo "❌ Code signature verification failed."
+    exit 1
+  fi
 else
   echo "⚠️  No stable signing identity found. Falling back to ad-hoc signing."
   echo "⚠️  macOS may re-prompt for Microphone permissions after each rebuild."

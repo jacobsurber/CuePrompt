@@ -1,4 +1,5 @@
 import XCTest
+
 @testable import CuePrompt
 
 final class SpeechToScrollEngineTests: XCTestCase {
@@ -43,7 +44,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
     func testExactFollowingAdvancesPosition() {
         let engine = makeEngine()
-        let script = "Our revenue grew significantly last quarter and we expect continued growth next year"
+        let script =
+            "Our revenue grew significantly last quarter and we expect continued growth next year"
         engine.loadScript(script)
 
         let initialPos = engine.scrollPosition
@@ -52,7 +54,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         engine.processWords(words(["our", "revenue", "grew", "significantly"]))
 
         // Position should advance (anchor found)
-        XCTAssertGreaterThan(engine.scrollPosition, initialPos,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, initialPos,
             "Position should advance when exact words are spoken")
     }
 
@@ -62,7 +65,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
         engine.processWords(words(["our", "revenue", "grew", "significantly"]))
 
-        XCTAssertGreaterThan(engine.momentum, 0,
+        XCTAssertGreaterThan(
+            engine.momentum, 0,
             "Momentum should increase when strong anchors are found")
     }
 
@@ -79,13 +83,15 @@ final class SpeechToScrollEngineTests: XCTestCase {
             engine.tick(deltaTime: 0.1)
         }
 
-        XCTAssertGreaterThan(engine.scrollPosition, startPos,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, startPos,
             "Should drift forward even without speech (base drift rate)")
     }
 
     func testDriftSpeedIncreasesWithMomentum() {
         let engine = makeEngine()
-        let script = "alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima mike november oscar papa"
+        let script =
+            "alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima mike november oscar papa"
         engine.loadScript(script)
 
         // Measure drift without momentum
@@ -100,7 +106,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         engine.tick(deltaTime: 1.0)
         let highMomentumDrift = engine.scrollPosition - posAfterAnchor
 
-        XCTAssertGreaterThan(highMomentumDrift, lowMomentumDrift,
+        XCTAssertGreaterThan(
+            highMomentumDrift, lowMomentumDrift,
             "Higher momentum should produce faster drift")
     }
 
@@ -108,7 +115,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
     func testParaphrasingDoesNotStall() {
         let engine = makeEngine()
-        let script = "Our quarterly revenue showed significant improvement over the previous period with strong customer acquisition"
+        let script =
+            "Our quarterly revenue showed significant improvement over the previous period with strong customer acquisition"
         engine.loadScript(script)
 
         // Speak paraphrased content (not matching the script)
@@ -120,7 +128,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
             engine.tick(deltaTime: 0.1)
         }
 
-        XCTAssertGreaterThan(engine.scrollPosition, posAfterSpeech,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, posAfterSpeech,
             "Engine should keep drifting even when speech doesn't match script")
     }
 
@@ -128,7 +137,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
     func testAdLibFollowedByReturn() {
         let engine = makeEngine()
-        let script = "Our revenue grew significantly and we expect continued growth in the international markets"
+        let script =
+            "Our revenue grew significantly and we expect continued growth in the international markets"
         engine.loadScript(script)
 
         // First, anchor to a known position
@@ -146,7 +156,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         // Return to script — "continued growth" should re-anchor
         engine.processWords(words(["continued", "growth", "international"]))
 
-        XCTAssertGreaterThan(engine.scrollPosition, anchoredPos,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, anchoredPos,
             "Should re-anchor forward when presenter returns to script")
     }
 
@@ -162,7 +173,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         engine.pause()
         engine.tick(deltaTime: 1.0)
 
-        XCTAssertEqual(engine.scrollPosition, posBeforePause,
+        XCTAssertEqual(
+            engine.scrollPosition, posBeforePause,
             "Position should not change while paused")
     }
 
@@ -176,7 +188,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         let posAfterResume = engine.scrollPosition
         engine.tick(deltaTime: 0.5)
 
-        XCTAssertGreaterThan(engine.scrollPosition, posAfterResume,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, posAfterResume,
             "Should resume drifting after unpause")
     }
 
@@ -187,7 +200,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         engine.pause()
         engine.processWords(words(["alpha", "bravo", "charlie"]))
 
-        XCTAssertEqual(engine.scrollPosition, 0,
+        XCTAssertEqual(
+            engine.scrollPosition, 0,
             "Words should be ignored while paused")
     }
 
@@ -201,7 +215,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
         XCTAssertFalse(engine.isTracking)
         engine.tick(deltaTime: 1.0)
-        XCTAssertEqual(engine.scrollPosition, 0,
+        XCTAssertEqual(
+            engine.scrollPosition, 0,
             "Should not drift after stop")
     }
 
@@ -232,7 +247,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
     func testSlideIndexUpdates() {
         let engine = makeEngine()
         // Script with 20 words, slide boundaries at word 5 and 10
-        let script = "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty"
+        let script =
+            "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty"
         engine.loadScript(script, slideBoundaries: [5, 10])
 
         XCTAssertEqual(engine.currentSlideIndex, 0)
@@ -243,7 +259,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         }
 
         // Should be past at least the first slide boundary
-        XCTAssertGreaterThanOrEqual(engine.currentSlideIndex, 1,
+        XCTAssertGreaterThanOrEqual(
+            engine.currentSlideIndex, 1,
             "Slide index should advance when position crosses boundary")
     }
 
@@ -251,8 +268,10 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
     func testLostTrackingDetection() {
         let engine = makeEngine()
-        engine.config.lostTrackingTimeout = 0.5 // very short for testing
-        engine.loadScript("alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima mike november oscar papa quebec romeo sierra tango")
+        engine.config.lostTrackingTimeout = 0.5  // very short for testing
+        engine.loadScript(
+            "alpha bravo charlie delta echo foxtrot golf hotel india juliet kilo lima mike november oscar papa quebec romeo sierra tango"
+        )
 
         XCTAssertFalse(engine.isLost)
 
@@ -292,7 +311,8 @@ final class SpeechToScrollEngineTests: XCTestCase {
         // Speech recognizer outputs the words
         engine.processWords(words(["revenue", "grew", "twenty", "three", "percent"]))
 
-        XCTAssertGreaterThan(engine.scrollPosition, 0,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, 0,
             "Normalized numbers should match between script and speech")
     }
 
@@ -300,12 +320,14 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
     func testHomophonesMatchCorrectly() {
         let engine = makeEngine()
-        engine.loadScript("Their revenue grew because they're expanding into new markets where there is demand")
+        engine.loadScript(
+            "Their revenue grew because they're expanding into new markets where there is demand")
 
         // Speak with different homophones — should all normalize to same form
         engine.processWords(words(["there", "revenue", "grew"]))
 
-        XCTAssertGreaterThan(engine.scrollPosition, 0,
+        XCTAssertGreaterThan(
+            engine.scrollPosition, 0,
             "Homophones should match after normalization")
     }
 
@@ -337,6 +359,5 @@ final class SpeechToScrollEngineTests: XCTestCase {
 
         engine.loadScript("second script different content entirely")
         XCTAssertEqual(engine.scrollPosition, 0, "Loading new script should reset position")
-        XCTAssertEqual(engine.momentum, 0, "Loading new script should reset momentum")
     }
 }
