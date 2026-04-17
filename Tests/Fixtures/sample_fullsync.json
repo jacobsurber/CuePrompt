@@ -1,0 +1,29 @@
+{
+  "type": "fullSync",
+  "slides": [
+    {
+      "slideIndex": 0,
+      "speakerNotes": "Welcome everyone to this presentation about our Q3 revenue growth.",
+      "slideTitle": "Q3 Revenue Growth",
+      "thumbnailDataURL": null
+    },
+    {
+      "slideIndex": 1,
+      "speakerNotes": "Our total revenue increased by twenty three percent year over year.",
+      "slideTitle": "Revenue Overview",
+      "thumbnailDataURL": null
+    },
+    {
+      "slideIndex": 2,
+      "speakerNotes": "The key driver was our enterprise segment, which grew by forty five percent.",
+      "slideTitle": "Enterprise Growth",
+      "thumbnailDataURL": null
+    },
+    {
+      "slideIndex": 3,
+      "speakerNotes": null,
+      "slideTitle": "Thank You",
+      "thumbnailDataURL": null
+    }
+  ]
+}

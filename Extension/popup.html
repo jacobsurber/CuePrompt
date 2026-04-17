@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 240px;
+        padding: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        font-size: 13px;
+        color: #e0e0e0;
+        background: #1e1e1e;
+        margin: 0;
+      }
+      .header {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .dot.connected {
+        background: #34c759;
+      }
+      .dot.connecting {
+        background: #ffcc00;
+      }
+      .dot.disconnected {
+        background: #8e8e93;
+      }
+      button {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        border-radius: 6px;
+        font-size: 13px;
+        cursor: pointer;
+        background: #333;
+        color: #e0e0e0;
+      }
+      button:hover {
+        background: #444;
+      }
+      button.primary {
+        background: #0a84ff;
+        color: white;
+      }
+      button.primary:hover {
+        background: #409cff;
+      }
+      .help {
+        margin-top: 12px;
+        font-size: 11px;
+        color: #8e8e93;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">CuePrompt</div>
+    <div class="status">
+      <div id="dot" class="dot disconnected"></div>
+      <span id="label">Disconnected</span>
+    </div>
+    <button id="btn" class="primary">Connect</button>
+    <div class="help">
+      Make sure CuePrompt is running on your Mac. The extension connects
+      automatically when you open Google Slides.
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

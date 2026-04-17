@@ -73,33 +73,16 @@ cat > CuePrompt.app/Contents/Info.plist <<EOF
 </plist>
 EOF
 
-# Entitlements
-cat > /tmp/CuePrompt.entitlements <<'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>com.apple.security.device.audio-input</key>
-    <true/>
-    <key>com.apple.security.network.client</key>
-    <true/>
-    <key>com.apple.security.network.server</key>
-    <true/>
-</dict>
-</plist>
-EOF
-
 # Code sign
+ENTITLEMENTS="$SCRIPT_DIR/../Entitlements/CuePrompt.entitlements"
 DETECTED_HASH=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | awk '{print $2}')
 if [ -n "$DETECTED_HASH" ]; then
   echo "Signing with Developer ID..."
-  codesign --force --deep --sign "$DETECTED_HASH" --options runtime --entitlements /tmp/CuePrompt.entitlements CuePrompt.app
+  codesign --force --deep --sign "$DETECTED_HASH" --options runtime --entitlements "$ENTITLEMENTS" CuePrompt.app
   codesign --verify --verbose CuePrompt.app
 else
   echo "No Developer ID found. App will be unsigned."
 fi
-
-rm -f /tmp/CuePrompt.entitlements
 
 echo "Build complete!"
 open -R CuePrompt.app
