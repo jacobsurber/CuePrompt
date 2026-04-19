@@ -4,7 +4,7 @@ import WhisperKit
 /// Manages WhisperKit model lifecycle: download, load, and availability.
 ///
 /// Uses a shared storage root at `~/Documents/Models/WhisperKit/` so that
-/// CuePrompt and other apps (e.g. Whisp/VoiceFlow) share the same multi-GB
+/// CuePrompt and other apps (e.g. Whisp) share the same multi-GB
 /// models without duplication. Falls back to the legacy app-specific path
 /// for existing installs.
 @Observable
@@ -33,7 +33,7 @@ final class ModelManager {
     ]
 
     /// Shared model storage root: ~/Documents/Models/WhisperKit/
-    /// Both CuePrompt and Whisp (VoiceFlow) use this location.
+    /// Both CuePrompt and Whisp use this location.
     private var baseDirectory: URL? {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
             .appendingPathComponent("Models/WhisperKit", isDirectory: true)
