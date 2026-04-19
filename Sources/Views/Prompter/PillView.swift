@@ -36,7 +36,7 @@ struct PillView: View {
             )
         )
         .onHover { hovering in
-            withAnimation(.easeInOut(duration: 0.15)) {
+            withAnimation(.easeInOut(duration: CueDuration.micro)) {
                 isHovering = hovering
             }
         }
@@ -51,7 +51,7 @@ struct PillView: View {
             VStack {
                 Spacer()
                 Circle()
-                    .fill(isListening ? Color.green : Color.clear)
+                    .fill(isListening ? CueColors.micActive : Color.clear)
                     .frame(width: 5, height: 5)
                     .padding(.bottom, 4)
             }

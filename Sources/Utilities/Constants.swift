@@ -6,13 +6,13 @@ enum AppConstants {
     static let websocketPort: UInt16 = 19876
 
     // Panel level (above all windows, excluded from screen share)
-    static let panelLevel = 25 // NSWindow.Level.floating + some
+    static let panelLevel = 25  // NSWindow.Level.floating + some
 
-    // Animation durations (seconds)
-    static let fadeInDuration: TimeInterval = 0.2
-    static let fadeOutDuration: TimeInterval = 0.2
-    static let expandDuration: TimeInterval = 0.4
-    static let collapseDuration: TimeInterval = 0.35
+    // Animation durations (seconds) — aligned with DESIGN.md
+    static let fadeInDuration: TimeInterval = CueDuration.short
+    static let fadeOutDuration: TimeInterval = CueDuration.short
+    static let expandDuration: TimeInterval = CueDuration.medium
+    static let collapseDuration: TimeInterval = CueDuration.medium
 
     // MARK: - Formatting
 

@@ -45,7 +45,7 @@ struct SpeechSettingsView: View {
         case .downloaded:
             HStack {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(CueColors.micActive)
                 Text("Model downloaded: \(settings.preferredModel)")
                     .foregroundStyle(.secondary)
             }
@@ -56,14 +56,14 @@ struct SpeechSettingsView: View {
         case .ready:
             HStack {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(CueColors.micActive)
                 Text("Model ready")
             }
 
         case .error(let msg):
             VStack(alignment: .leading, spacing: 4) {
                 Text(msg)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(CueColors.error)
                 Button("Retry") {
                     modelManager.scanLocalModels()
                 }

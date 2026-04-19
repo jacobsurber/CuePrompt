@@ -70,14 +70,16 @@ final class WindowManager {
     func hide() {
         guard let panel else { return }
         removeKeyMonitor()
-        NSAnimationContext.runAnimationGroup({ ctx in
-            ctx.duration = AppConstants.fadeOutDuration
-            ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
-            panel.animator().alphaValue = 0
-        }, completionHandler: { [weak self] in
-            panel.orderOut(nil)
-            self?.isVisible = false
-        })
+        NSAnimationContext.runAnimationGroup(
+            { ctx in
+                ctx.duration = AppConstants.fadeOutDuration
+                ctx.timingFunction = CAMediaTimingFunction(name: .easeIn)
+                panel.animator().alphaValue = 0
+            },
+            completionHandler: { [weak self] in
+                panel.orderOut(nil)
+                self?.isVisible = false
+            })
     }
 
     // MARK: - Expand / Collapse
@@ -94,12 +96,8 @@ final class WindowManager {
             height: settings.expandedHeight
         )
 
-        // Smooth expansion: both width and height grow from the notch center-top
-        NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = AppConstants.expandDuration
-            ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.16, 1.0, 0.3, 1.0)
-            panel.animator().setFrame(target, display: true)
-        }
+        // Animated NSPanel frame changes can re-enter NSHostingView layout and abort on macOS 26.
+        panel.setFrame(target, display: true)
     }
 
     /// Collapse back into the notch. Shrinks to match notch size and position.
@@ -110,17 +108,14 @@ final class WindowManager {
         let screen = ScreenDetector.screen(forDisplayID: settings.targetDisplayID)
         let target = ScreenDetector.notchFrame(for: screen)
 
-        NSAnimationContext.runAnimationGroup { ctx in
-            ctx.duration = AppConstants.collapseDuration
-            ctx.timingFunction = CAMediaTimingFunction(controlPoints: 0.4, 0.0, 0.2, 1.0)
-            panel.animator().setFrame(target, display: true)
-        }
+        panel.setFrame(target, display: true)
     }
 
     // MARK: - Content
 
     func setContentView<V: View>(_ view: V) {
         let hostingView = NSHostingView(rootView: view)
+        hostingView.sizingOptions = []  // Disable auto window sizing — we manage frame explicitly
         hostingView.frame = panel?.contentView?.bounds ?? .zero
         hostingView.autoresizingMask = [.width, .height]
         panel?.contentView = hostingView
@@ -133,13 +128,13 @@ final class WindowManager {
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self, self.isVisible else { return event }
             switch event.keyCode {
-            case 49: // Space
+            case 49:  // Space
                 self.onSpacePressed?()
                 return nil
-            case 126: // Up arrow
+            case 126:  // Up arrow
                 self.onArrowUp?()
                 return nil
-            case 125: // Down arrow
+            case 125:  // Down arrow
                 self.onArrowDown?()
                 return nil
             default:

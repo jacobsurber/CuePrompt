@@ -4,6 +4,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/.." || exit 1
+source "$SCRIPT_DIR/signing-common.sh"
 
 NOTARIZE=false
 while [[ $# -gt 0 ]]; do
@@ -38,6 +39,26 @@ mkdir -p CuePrompt.app/Contents/{MacOS,Resources}
 
 cp .build/apple/Products/Release/CuePrompt CuePrompt.app/Contents/MacOS/
 chmod +x CuePrompt.app/Contents/MacOS/CuePrompt
+
+# Generate app icon from source PNG
+echo "Generating app icon..."
+ICON_SOURCE="Sources/Resources/AppIcon-source.png"
+ICONSET_DIR="AppIcon.iconset"
+if [ -f "$ICON_SOURCE" ]; then
+  mkdir -p "$ICONSET_DIR"
+  for pair in "16 icon_16x16" "32 icon_16x16@2x" "32 icon_32x32" "64 icon_32x32@2x" \
+              "128 icon_128x128" "256 icon_128x128@2x" "256 icon_256x256" "512 icon_256x256@2x" \
+              "512 icon_512x512" "1024 icon_512x512@2x"; do
+    SIZE="${pair%% *}"
+    NAME="${pair#* }"
+    sips -z "$SIZE" "$SIZE" "$ICON_SOURCE" --out "$ICONSET_DIR/${NAME}.png" >/dev/null 2>&1
+  done
+  iconutil -c icns -o CuePrompt.app/Contents/Resources/AppIcon.icns "$ICONSET_DIR"
+  rm -rf "$ICONSET_DIR"
+  echo "  App icon installed."
+else
+  echo "  ⚠️  $ICON_SOURCE not found — skipping icon generation."
+fi
 
 # Info.plist
 cat > CuePrompt.app/Contents/Info.plist <<EOF
@@ -75,13 +96,31 @@ EOF
 
 # Code sign
 ENTITLEMENTS="$SCRIPT_DIR/../Entitlements/CuePrompt.entitlements"
-DETECTED_HASH=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | awk '{print $2}')
-if [ -n "$DETECTED_HASH" ]; then
-  echo "Signing with Developer ID..."
-  codesign --force --deep --sign "$DETECTED_HASH" --options runtime --entitlements "$ENTITLEMENTS" CuePrompt.app
-  codesign --verify --verbose CuePrompt.app
+SIGNING_IDENTITY="$(cueprompt_detect_signing_identity || true)"
+SIGNING_NAME="$(cueprompt_detect_signing_identity_name || true)"
+
+if [ -n "$SIGNING_IDENTITY" ]; then
+  if [ -n "$SIGNING_NAME" ]; then
+    echo "🔍 Using signing identity: $SIGNING_NAME"
+  fi
+
+  echo "🔏 Code signing app with stable identity..."
+  if ! cueprompt_sign_app_bundle "CuePrompt.app" "$ENTITLEMENTS" "$SIGNING_IDENTITY"; then
+    echo "❌ Code signing failed. Check that $ENTITLEMENTS exists and the identity is valid."
+    exit 1
+  fi
+  if ! codesign --verify --verbose CuePrompt.app; then
+    echo "❌ Code signature verification failed."
+    exit 1
+  fi
 else
-  echo "No Developer ID found. App will be unsigned."
+  echo "⚠️  No stable signing identity found. Falling back to ad-hoc signing."
+  echo "⚠️  macOS may re-prompt for Microphone permissions after each rebuild."
+  echo "💡 Run 'make setup-local-signing' once to create a persistent local signing identity for development."
+
+  cueprompt_sign_app_bundle \
+    "CuePrompt.app" \
+    "$ENTITLEMENTS"
 fi
 
 echo "Build complete!"

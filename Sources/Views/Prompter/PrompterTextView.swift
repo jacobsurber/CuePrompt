@@ -56,7 +56,9 @@ struct PrompterTextView: NSViewRepresentable {
         let contentKey = sections.map(\.text).joined()
         let currentWidth = scrollView.contentView.bounds.width
         let widthChanged = currentWidth > 0 && abs(currentWidth - coordinator.lastLayoutWidth) > 10
-        if coordinator.lastContentKey != contentKey || coordinator.lastFontSize != settings.fontSize || widthChanged {
+        if coordinator.lastContentKey != contentKey || coordinator.lastFontSize != settings.fontSize
+            || widthChanged
+        {
             coordinator.lastContentKey = contentKey
             coordinator.lastFontSize = settings.fontSize
             coordinator.lastLayoutWidth = currentWidth
@@ -82,10 +84,19 @@ struct PrompterTextView: NSViewRepresentable {
         guard let textView = coordinator.textView else { return }
 
         let fullAttributed = NSMutableAttributedString()
-        let baseFont = NSFont(name: settings.fontName, size: settings.fontSize)
-            ?? NSFont.systemFont(ofSize: settings.fontSize)
-        let titleFont = NSFont(name: settings.fontName, size: settings.fontSize * 1.3)
-            ?? NSFont.systemFont(ofSize: settings.fontSize * 1.3, weight: .bold)
+        let baseFont = CueFont.prompterFont(name: settings.fontName, size: settings.fontSize)
+        let titleFont: NSFont = {
+            let size = settings.fontSize * 1.3
+            if settings.fontName == "New York",
+                let desc = NSFontDescriptor.preferredFontDescriptor(forTextStyle: .body)
+                    .withDesign(.serif)?.withSymbolicTraits(.bold)
+            {
+                return NSFont(descriptor: desc, size: size)
+                    ?? NSFont.systemFont(ofSize: size, weight: .bold)
+            }
+            return NSFont(name: settings.fontName, size: size)
+                ?? NSFont.systemFont(ofSize: size, weight: .bold)
+        }()
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
@@ -103,7 +114,7 @@ struct PrompterTextView: NSViewRepresentable {
         textShadow.shadowBlurRadius = 4
 
         var wordPositions: [Int] = []  // character index of each word start
-        var wordLengths: [Int] = []    // character length of each word
+        var wordLengths: [Int] = []  // character length of each word
 
         for (sectionIdx, section) in sections.enumerated() {
             let style = sectionIdx == 0 ? paragraphStyle : sectionSpacing
@@ -117,11 +128,14 @@ struct PrompterTextView: NSViewRepresentable {
                     .shadow: textShadow,
                 ]
                 let titleStr = NSAttributedString(string: title + "\n", attributes: titleAttrs)
-                let titleWords = title.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+                let titleWords = title.components(separatedBy: .whitespacesAndNewlines).filter {
+                    !$0.isEmpty
+                }
                 var titleSearchStart = title.startIndex
                 for word in titleWords {
                     if let range = title.range(of: word, range: titleSearchStart..<title.endIndex) {
-                        let charOffset = title.distance(from: title.startIndex, to: range.lowerBound)
+                        let charOffset = title.distance(
+                            from: title.startIndex, to: range.lowerBound)
                         wordPositions.append(fullAttributed.length + charOffset)
                         wordLengths.append(word.count)
                         titleSearchStart = range.upperBound
@@ -149,12 +163,16 @@ struct PrompterTextView: NSViewRepresentable {
 
             // Track word positions in the rendered (clean) text
             let renderedString = renderedBody.string
-            let cleanWords = renderedString.components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+            let cleanWords = renderedString.components(separatedBy: .whitespacesAndNewlines).filter
+            { !$0.isEmpty }
             let bodyStart = fullAttributed.length
             var bodySearchStart = renderedString.startIndex
             for word in cleanWords {
-                if let range = renderedString.range(of: word, range: bodySearchStart..<renderedString.endIndex) {
-                    let charOffset = renderedString.distance(from: renderedString.startIndex, to: range.lowerBound)
+                if let range = renderedString.range(
+                    of: word, range: bodySearchStart..<renderedString.endIndex)
+                {
+                    let charOffset = renderedString.distance(
+                        from: renderedString.startIndex, to: range.lowerBound)
                     wordPositions.append(bodyStart + charOffset)
                     wordLengths.append(word.count)
                     bodySearchStart = range.upperBound
@@ -165,19 +183,24 @@ struct PrompterTextView: NSViewRepresentable {
             }
 
             fullAttributed.append(renderedBody)
-            fullAttributed.append(NSAttributedString(string: "\n\n", attributes: [
-                .font: baseFont,
-                .foregroundColor: NSColor.white,
-                .paragraphStyle: style,
-            ]))
+            fullAttributed.append(
+                NSAttributedString(
+                    string: "\n\n",
+                    attributes: [
+                        .font: baseFont,
+                        .foregroundColor: NSColor.white,
+                        .paragraphStyle: style,
+                    ]))
         }
 
         // Add top/bottom padding so text can scroll to center at start/end
         let paddingHeight = max(viewportHeight / 2.0, 200)
-        let paddingStr = NSAttributedString(string: "\n", attributes: [
-            .font: NSFont.systemFont(ofSize: paddingHeight / 4),
-            .foregroundColor: NSColor.clear,
-        ])
+        let paddingStr = NSAttributedString(
+            string: "\n",
+            attributes: [
+                .font: NSFont.systemFont(ofSize: paddingHeight / 4),
+                .foregroundColor: NSColor.clear,
+            ])
         let paddedContent = NSMutableAttributedString()
         paddedContent.append(paddingStr)
         paddedContent.append(fullAttributed)

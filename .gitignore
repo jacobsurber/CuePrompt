@@ -17,7 +17,6 @@ CuePrompt.app/
 CuePrompt.zip
 *.dmg
 notarization.log
-*.entitlements
 
 # Icon generation
 CuePrompt.iconset/
@@ -25,3 +24,6 @@ CuePrompt.iconset/
 # Environment
 .env
 .env.local
+
+# Python cache
+__pycache__/
